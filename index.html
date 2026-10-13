@@ -111,7 +111,24 @@
             <p class="todo">Everyone: who did what, about how many hours, and what took the longest (from LOG.md).</p>
 
             <h3>AI usage</h3>
-            <p class="todo">Everyone: how we each used AI (from LOG.md).</p>
+            <p>
+                We used AI (Claude) as a coding helper. The design decisions were ours: we picked the dataset and our
+                question, decided which crimes and years to include, chose the theft type and location groups, and designed
+                the three linked views and how you interact with them. AI helped us turn those decisions into code faster.
+            </p>
+            <ul>
+                <li><strong>Person A:</strong> used AI to write the script that downloads the data through the API (after
+                    the portal's export kept failing) and the cleaning script, to turn our View 1 design into D3 code, and to
+                    help fix bugs. We checked its work by comparing our row counts to the portal's yearly totals, printing
+                    every location value to make sure it landed in the right group, and testing the filters in the browser.</li>
+                <li><strong>Person B:</strong> <span class="todo">to fill in.</span></li>
+                <li><strong>Person C:</strong> <span class="todo">to fill in.</span></li>
+            </ul>
+            <p>
+                AI saved a lot of time, but we still had to catch its mistakes. For example, simple keyword matching put
+                barbershops in the "bar" group and bowling alleys in "street/alley", and the first version of the code was
+                more complicated than it needed to be, so we rewrote it in the same style as our labs.
+            </p>
 
             <h3>References</h3>
             <ul>
