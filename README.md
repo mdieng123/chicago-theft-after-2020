@@ -22,7 +22,14 @@ The portal's Export button times out on the full dataset (8M+ rows). Use the API
 ./scripts/download_raw.sh
 ```
 
-This saves ~716k theft rows to `data/raw/` (gitignored). `scripts/prepare_data.py` then aggregates them into the small committed files in `data/`.
+This saves ~716k theft rows to `data/raw/` (gitignored). Then aggregate them into the small committed files in `data/`:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python scripts/prepare_data.py
+```
+
+You only need to do this if the cleaning rules change. The output files are already committed.
 
 ## Run locally
 ```bash

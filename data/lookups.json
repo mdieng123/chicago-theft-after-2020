@@ -1,0 +1,58 @@
+{
+  "type_groups": [
+    "Retail",
+    "From building",
+    "Pickpocket/purse",
+    "Over $500",
+    "$500 & under",
+    "Other theft",
+    "Automobile",
+    "Other vehicle"
+  ],
+  "loc_groups": [
+    "Street/alley",
+    "Residence",
+    "Retail store",
+    "Restaurant/bar",
+    "Transit",
+    "Parking",
+    "Commercial/office",
+    "Other"
+  ],
+  "sides": [
+    "Far North",
+    "Northwest",
+    "North",
+    "West",
+    "Central",
+    "South",
+    "Southwest",
+    "Far Southwest",
+    "Far Southeast",
+    "Unknown"
+  ],
+  "periods": {
+    "pre": [
+      2016,
+      2019
+    ],
+    "covid": [
+      2020,
+      2020
+    ],
+    "post": [
+      2021,
+      2025
+    ]
+  },
+  "type_primary": {
+    "Retail": "THEFT",
+    "From building": "THEFT",
+    "Pickpocket/purse": "THEFT",
+    "Over $500": "THEFT",
+    "$500 & under": "THEFT",
+    "Other theft": "THEFT",
+    "Automobile": "MOTOR VEHICLE THEFT",
+    "Other vehicle": "MOTOR VEHICLE THEFT"
+  }
+}

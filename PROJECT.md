@@ -93,9 +93,12 @@ year,hour,type_group,loc_group,side,count
   "type_groups": [...],
   "loc_groups": [...],
   "sides": [...],
-  "periods": { "pre": [2016, 2019], "covid": [2020, 2020], "post": [2021, 2025] }
+  "periods": { "pre": [2016, 2019], "covid": [2020, 2020], "post": [2021, 2025] },
+  "type_primary": { "Retail": "THEFT", ..., "Automobile": "MOTOR VEHICLE THEFT" }
 }
 ```
+
+`type_primary` maps each `type_group` to its `Primary Type`, so the Theft / Motor vehicle checkboxes can filter rows (the CSVs have no `primary_type` column). `side` is `Unknown` for the ~90 rows with no community area.
 
 All numbers shown on the page must be computed from these files. Nothing is hardcoded.
 
