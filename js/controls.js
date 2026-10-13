@@ -1,17 +1,14 @@
-// STUB — Person B replaces this file with the real filter panel (see PROJECT.md "Controls").
-// It only shows the summary line and a Reset button so the views can be tested together.
-import { filters, resetFilters } from './state.js';
+// controls.js (Person B)
+// PLACEHOLDER: Person B replaces this with the real filters
+// (year range, Theft / Motor vehicle checkboxes, type, location and side dropdowns).
+// For now it only shows the summary line and a Reset button.
 
-let summary;
-
-export function init(containerSelector) {
-  const root = d3.select(containerSelector);
-  summary = root.append('p').attr('class', 'summary');
-  root.append('button').attr('type', 'button').text('Reset').on('click', resetFilters);
+function initControls() {
+  d3.select('#controls').append('p').attr('id', 'summary');
+  d3.select('#controls').append('button').text('Reset').on('click', resetFilters);
 }
 
-export function update(filteredData) {
-  const total = d3.sum(filteredData.monthly, d => d.count);
-  const [y0, y1] = filters.yearRange;
-  summary.text(`Showing ${d3.format(',')(total)} thefts · ${y0}–${y1}`);
+function updateControls(data) {
+  const total = d3.sum(data, d => d.count);
+  d3.select('#summary').text('Showing ' + d3.format(',')(total) + ' thefts · ' + filters.startYear + '–' + filters.endYear);
 }

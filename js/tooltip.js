@@ -1,35 +1,15 @@
-// Shared tooltip. Owner: C. (A wrote this working first version so the views can be
-// integrated early; C restyles or rewrites it, keeping the show/move/hide API.)
+// tooltip.js (Person C)
+// One tooltip that every chart uses. The <div id="tooltip"> is in index.html.
+// (Person A made this basic version so the charts work now. Person C can change the look.)
 
-let el;
-
-function tip() {
-  if (!el) el = d3.select('body').append('div').attr('class', 'tooltip').attr('role', 'status');
-  return el;
-}
-
-// rows: [[label, value], ...] in the order from PROJECT.md (count, share, change, arrest rate)
-export function show(event, { title, rows }) {
-  tip()
+function showTooltip(event, html) {
+  d3.select('#tooltip')
     .style('display', 'block')
-    .html(
-      `<div class="tooltip-title">${title}</div>` +
-      rows.map(([label, value]) => `<div class="tooltip-row"><span>${label}</span><b>${value}</b></div>`).join('')
-    );
-  move(event);
+    .html(html)
+    .style('left', (event.pageX + 20) + 'px')
+    .style('top', (event.pageY - 28) + 'px');
 }
 
-export function move(event) {
-  const node = tip().node();
-  const pad = 14;
-  const { width, height } = node.getBoundingClientRect();
-  let left = event.clientX + pad;
-  let top = event.clientY + pad;
-  if (left + width > window.innerWidth - 8) left = event.clientX - width - pad;
-  if (top + height > window.innerHeight - 8) top = event.clientY - height - pad;
-  tip().style('left', `${left}px`).style('top', `${top}px`);
-}
-
-export function hide() {
-  tip().style('display', 'none');
+function hideTooltip() {
+  d3.select('#tooltip').style('display', 'none');
 }

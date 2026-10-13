@@ -1,11 +1,10 @@
-// STUB — Person B replaces this file with View 2 (see PROJECT.md "Views").
-// It only proves the view receives filtered data.
-let note;
+// changeView.js (Person B)
+// PLACEHOLDER: Person B replaces this with View 2 (bars showing % change before vs after).
 
-export function init(containerSelector) {
-  note = d3.select(containerSelector).append('p').attr('class', 'stub');
+function initChange() {
+  d3.select('#view-change').append('p').attr('class', 'placeholder');
 }
 
-export function update(filteredData) {
-  note.text(`View 2 placeholder (Person B): receiving ${d3.format(',')(filteredData.monthly.length)} monthly rows.`);
+function updateChange(data) {
+  d3.select('#view-change .placeholder').text('View 2 goes here (Person B). Getting ' + data.length + ' monthly rows.');
 }

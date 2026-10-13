@@ -1,50 +1,52 @@
-// Shared filter state. Every view reads from here; only setFilters/resetFilters change it.
-// See PROJECT.md "Shared APIs" before editing (owner: A).
+// state.js (Person A)
+// The data and filters that all the charts share.
 
-const DEFAULTS = {
-  yearRange: [2016, 2025],
-  primaryTypes: ['THEFT', 'MOTOR VEHICLE THEFT'],
-  typeGroups: null, // array of type_group strings, or null for all
-  locGroups: null,
-  sides: null,
+// All the data (main.js fills these in after loading the files)
+let allMonthly = [];
+let allHourly = [];
+let lookups = {};
+
+// Filter settings. 'All' means don't filter on that.
+const defaultFilters = {
+  startYear: 2016,
+  endYear: 2025,
+  showTheft: true,
+  showVehicle: true,
+  typeGroup: 'All',
+  locGroup: 'All',
+  side: 'All'
 };
+let filters = { ...defaultFilters };
 
-export const filters = structuredClone(DEFAULTS);
-
-const listeners = [];
-
-// Shallow-merge a patch into filters, then notify listeners.
-export function setFilters(patch) {
-  Object.assign(filters, patch);
-  notify();
+// Returns only the rows that match the current filters.
+// ignore (optional): the name of one filter to skip.
+//   'years'     -> used by View 1 for the 2016-19 average, so it doesn't change when you zoom
+//   'typeGroup' -> used by View 2 so it can still show every type bar
+//   'locGroup'  -> same idea for the location bars
+function filterData(rows, ignore) {
+  return rows.filter(d => {
+    if (ignore !== 'years' && (d.year < filters.startYear || d.year > filters.endYear)) return false;
+    if (d.primary === 'THEFT' && !filters.showTheft) return false;
+    if (d.primary === 'MOTOR VEHICLE THEFT' && !filters.showVehicle) return false;
+    if (ignore !== 'typeGroup' && filters.typeGroup !== 'All' && d.type_group !== filters.typeGroup) return false;
+    if (ignore !== 'locGroup' && filters.locGroup !== 'All' && d.loc_group !== filters.locGroup) return false;
+    if (filters.side !== 'All' && d.side !== filters.side) return false;
+    return true;
+  });
 }
 
-export function resetFilters() {
-  Object.assign(filters, structuredClone(DEFAULTS));
-  notify();
+// Call this after changing any filter. It redraws every chart.
+function updateAll() {
+  const monthly = filterData(allMonthly);
+  const hourly = filterData(allHourly);
+
+  updateControls(monthly);
+  updateTrend(monthly);
+  updateChange(monthly);
+  updateHeatmap(hourly);
 }
 
-export function onChange(fn) {
-  listeners.push(fn);
-}
-
-function notify() {
-  listeners.forEach(fn => fn(filters));
-}
-
-// Rows matching the current filters. `ignore` lists filter keys to skip, so a view
-// can avoid filtering on its own dimension (e.g. View 2 passes ['typeGroups']).
-// Rows need a `primary` field; main.js adds it on load from lookups.type_primary.
-export function applyFilters(rows, { ignore = [] } = {}) {
-  const use = key => !ignore.includes(key);
-  const allowed = (list, value) => list == null || list.includes(value);
-  const [y0, y1] = filters.yearRange;
-
-  return rows.filter(d =>
-    (!use('yearRange') || (d.year >= y0 && d.year <= y1)) &&
-    (!use('primaryTypes') || filters.primaryTypes.includes(d.primary)) &&
-    (!use('typeGroups') || allowed(filters.typeGroups, d.type_group)) &&
-    (!use('locGroups') || allowed(filters.locGroups, d.loc_group)) &&
-    (!use('sides') || allowed(filters.sides, d.side))
-  );
+function resetFilters() {
+  filters = { ...defaultFilters };
+  updateAll();
 }

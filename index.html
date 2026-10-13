@@ -1,134 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chicago Theft After 2020</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-  <script type="module" src="js/main.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicago Theft After 2020</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="page-header">
-    <h1>How did Chicago theft patterns shift after 2020?</h1>
-    <p class="lede">
-      Ten years of reported thefts and motor vehicle thefts in Chicago, 2016–2025.
-      Use the filters to focus on a type of theft, a kind of place or a part of the city; every chart updates together.
-    </p>
-  </header>
 
-  <main>
-    <!-- Filter panel: js/controls.js (B) -->
-    <section id="controls" class="controls" aria-label="Filters"></section>
+    <div class="container">
+        <h1>How did Chicago theft patterns shift after 2020?</h1>
+        <p>
+            Reported thefts and motor vehicle thefts in Chicago from 2016 to 2025.
+            Use the filters to look at one type of theft, place or part of the city. All the charts update together.
+        </p>
 
-    <!-- View 1: js/trendView.js (A) -->
-    <section class="view">
-      <h2>How much: thefts per month</h2>
-      <p class="caption" id="trend-caption"></p>
-      <div id="view-trend"></div>
-      <p class="hint">Hover for monthly details. Drag across the chart to zoom every view to those years; Reset zooms back out.</p>
-    </section>
+        <!-- Filters (Person B) -->
+        <div id="controls"></div>
 
-    <!-- View 2: js/changeView.js (B) -->
-    <section class="view">
-      <h2>What and where: which thefts grew or shrank</h2>
-      <p class="caption" id="change-caption"></p>
-      <div id="view-change"></div>
-    </section>
+        <!-- View 1 (Person A) -->
+        <div class="view">
+            <h2>How much: thefts per month</h2>
+            <p class="caption" id="trend-caption"></p>
+            <div id="view-trend"></div>
+            <p class="hint">Hover over the chart to see each month. Drag across it to zoom all the charts to those years. Click Reset to zoom back out.</p>
+        </div>
 
-    <!-- View 3: js/heatmapView.js (C) -->
-    <section class="view">
-      <h2>When: thefts by hour of day</h2>
-      <p class="caption" id="heatmap-caption"></p>
-      <div id="view-heatmap"></div>
-    </section>
+        <!-- View 2 (Person B) -->
+        <div class="view">
+            <h2>What and where: which thefts went up or down</h2>
+            <p class="caption" id="change-caption"></p>
+            <div id="view-change"></div>
+        </div>
 
-    <!-- Write-up (C edits all sections into one voice) -->
-    <section class="writeup" id="writeup">
-      <h2>Write-up</h2>
+        <!-- View 3 (Person C) -->
+        <div class="view">
+            <h2>When: thefts by hour of day</h2>
+            <p class="caption" id="heatmap-caption"></p>
+            <div id="view-heatmap"></div>
+        </div>
 
-      <h3>The data</h3>
-      <p>
-        We use the City of Chicago's <em>Crimes – 2001 to Present</em> dataset, which the Chicago Police Department
-        publishes on the Chicago Data Portal. Each record is one reported crime, with its date and time, crime type,
-        a more specific description, the kind of place it happened, whether an arrest was made, and the community area.
-      </p>
-      <p>
-        We kept the two theft categories, <code>THEFT</code> and <code>MOTOR VEHICLE THEFT</code>, for the ten full years
-        2016–2025, which gives <span data-stat="total"></span> records. We included motor vehicle theft because the dataset
-        files it separately from theft, and leaving it out would hide a large part of the post-2020 change. 2026 is left
-        out because it is a partial year. We compare three periods: 2016–2019 as the baseline, 2020 as the pandemic year
-        (shown but not counted in either average), and 2021–2025 as "after".
-      </p>
-      <p>
-        The full dataset has more than 8 million rows, and the portal's export timed out, so we pulled only the rows we
-        needed through the portal's API (<code>scripts/download_raw.sh</code>, data retrieved October 13, 2026).
-        A Python script (<code>scripts/prepare_data.py</code>) then cleaned and aggregated them:
-      </p>
-      <ul>
-        <li><strong>Theft type.</strong> About 30 description values were grouped into 8 types (retail, from a building,
-          pickpocket/purse snatching, over $500, $500 and under, other theft, automobile, other vehicle). Attempted
-          thefts are counted with their type.</li>
-        <li><strong>Location type.</strong> About 140 location values were grouped into 8 kinds of place. Spellings change
-          across years (for example <code>RESIDENCE-GARAGE</code> and <code>RESIDENCE - GARAGE</code>), so we matched on
-          keywords, using whole-word matches so that, for example, "barbershop" is not counted as a bar.</li>
-        <li><strong>Side of the city.</strong> Each of the 77 community areas was mapped to one of Chicago's 9 "sides".
-          A handful of records with no community area are labeled "Unknown".</li>
-        <li><strong>Aggregation.</strong> The records were summed into counts by month and by hour of day for every
-          combination of year, theft type, location type and side, which keeps the files the page loads under 3 MB.</li>
-      </ul>
-      <p>
-        <strong>Limitations.</strong> These are <em>reported</em> crimes, so changes can reflect reporting as well as crime.
-        About 3% of thefts are logged at exactly 12:00 AM, usually because the true time is unknown (often thefts discovered
-        later), so the midnight hour is overstated. The portal omits the most recent seven days and can revise records,
-        so counts may differ slightly from a later download.
-      </p>
+        <!-- Write-up -->
+        <div class="writeup">
+            <h2>Write-up</h2>
 
-      <h3>Design rationale</h3>
+            <h3>About the data</h3>
+            <p>
+                We used the <em>Crimes - 2001 to Present</em> dataset from the Chicago Data Portal. Each row is one
+                reported crime and has the date and time, the type of crime, a description, the type of place, whether
+                someone was arrested, and the community area.
+            </p>
+            <p>
+                We only kept <strong>THEFT</strong> and <strong>MOTOR VEHICLE THEFT</strong> from 2016 to 2025, which is
+                716,105 rows. We included motor vehicle theft because it is a separate category in the data and it changed
+                the most after 2020. We left out 2026 because the year isn't over. We compare 2016-2019 (before) to
+                2021-2025 (after) and show 2020 on its own because of the pandemic.
+            </p>
+            <p>
+                The full dataset is over 8 million rows and the export kept failing, so we downloaded only the rows we
+                needed using the portal's API. Then we used a Python script to group the data:
+            </p>
+            <ul>
+                <li><strong>Theft type:</strong> 8 groups (retail, from building, pickpocket/purse, over $500, $500 and under,
+                    other theft, automobile, other vehicle).</li>
+                <li><strong>Location type:</strong> 8 groups (street/alley, residence, retail store, restaurant/bar, transit,
+                    parking, commercial/office, other). The same place is spelled differently in different years, so we
+                    matched on keywords.</li>
+                <li><strong>Side of the city:</strong> the 77 community areas grouped into Chicago's 9 sides.</li>
+            </ul>
+            <p>
+                Then we counted thefts by month and by hour so the files are small enough to load in the browser.
+            </p>
+            <p>
+                <strong>Limitations:</strong> this is only crime that was reported. Also, about 3% of thefts are recorded
+                at exactly 12:00 AM, usually because no one knows the real time, so midnight looks higher than it really is.
+            </p>
 
-      <h4>View 1: thefts per month</h4>
-      <p>
-        A line chart is the clearest way to show volume over time, and plotting months rather than years keeps both the
-        sharp drop in spring 2020 and the seasonal summer peaks visible. Shaded bands mark the three periods so the reader
-        can compare before and after at a glance, a dashed line marks the March 2020 stay-at-home order, and a dashed
-        horizontal line shows the 2016–2019 monthly average as a fixed baseline. The baseline ignores the year filter,
-        so it stays put when the reader zooms in. Hovering snaps to the nearest month and shows the count, its share of
-        the current selection, its change from the baseline and the arrest rate. Dragging across the chart sets the
-        year range for every view, which makes this chart the overview for the whole page.
-      </p>
-      <p>
-        <em>Alternatives considered:</em> yearly bars were simpler but hid the 2020 drop and the seasonality; a stacked
-        area chart by theft type showed composition but made the total and the baseline hard to read, and View 2 already
-        covers which types changed; small multiples by side gave nine small charts that were hard to compare, so side
-        became a filter instead.
-      </p>
+            <h3>Design decisions</h3>
 
-      <h4>View 2: what changed</h4>
-      <p class="todo">To be written by Person B.</p>
+            <h4>View 1: thefts per month</h4>
+            <p>
+                We used a line chart because it's the clearest way to show change over time. We used months instead of
+                years so you can see the big drop in spring 2020 and the summer peaks every year. The background is shaded
+                for before, 2020 and after. Dashed lines show the stay-at-home order (March 2020) and the 2016-2019 monthly
+                average, so you can tell if a month was above or below normal. The average line stays the same when you
+                zoom in, so you're always comparing to the same baseline.
+            </p>
+            <p>Interactions:</p>
+            <ul>
+                <li><strong>Tooltip (details on demand):</strong> hover to see the number of thefts that month, its share of
+                    the selection, how it compares to the 2016-2019 average, and the arrest rate.</li>
+                <li><strong>Brushing and linking:</strong> drag across the chart to zoom every chart to those years.
+                    Reset zooms back out.</li>
+            </ul>
+            <p>
+                Other options we thought about: a bar chart by year was simpler but hid the 2020 drop and the seasons. A stacked area
+                chart by theft type made the total hard to read, and View 2 already shows the theft types.
+            </p>
 
-      <h4>View 3: when thefts happen</h4>
-      <p class="todo">To be written by Person C.</p>
+            <h4>View 2: what changed</h4>
+            <p class="todo">Person B writes this.</p>
 
-      <h4>Filters</h4>
-      <p class="todo">To be written by Person B.</p>
+            <h4>View 3: when thefts happen</h4>
+            <p class="todo">Person C writes this.</p>
 
-      <h3>Development process</h3>
-      <p class="todo">From LOG.md: who did what, people-hours, and what took the longest. (All)</p>
+            <h4>Filters</h4>
+            <p class="todo">Person B writes this.</p>
 
-      <h3>AI usage</h3>
-      <p class="todo">From LOG.md: how each of us used AI assistants. (All)</p>
+            <h3>Development process</h3>
+            <p class="todo">Everyone: who did what, about how many hours, and what took the longest (from LOG.md).</p>
 
-      <h3>References</h3>
-      <ul>
-        <li>City of Chicago, <em>Crimes – 2001 to Present</em>, Chicago Data Portal (dataset <code>ijzp-q8t2</code>).
-          <a href="https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-Present/ijzp-q8t2">data.cityofchicago.org</a>.
-          Retrieved October 13, 2026.</li>
-        <li>"Community areas in Chicago," Wikipedia, for the mapping of community areas to the 9 sides.
-          <a href="https://en.wikipedia.org/wiki/Community_areas_in_Chicago">en.wikipedia.org/wiki/Community_areas_in_Chicago</a>.</li>
-        <li>State of Illinois, Executive Order 2020-10 (stay at home), issued March 20, 2020, effective March 21, 2020.</li>
-        <li>Bostock, M., <em>D3.js</em> version 7. <a href="https://d3js.org">d3js.org</a>.</li>
-      </ul>
-    </section>
-  </main>
+            <h3>AI usage</h3>
+            <p class="todo">Everyone: how we each used AI (from LOG.md).</p>
+
+            <h3>References</h3>
+            <ul>
+                <li>City of Chicago, Crimes - 2001 to Present, Chicago Data Portal.
+                    <a href="https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-Present/ijzp-q8t2">Link</a>
+                    (downloaded October 13, 2026).</li>
+                <li>Wikipedia, "Community areas in Chicago" (for grouping community areas into sides).
+                    <a href="https://en.wikipedia.org/wiki/Community_areas_in_Chicago">Link</a></li>
+                <li>Illinois Executive Order 2020-10 (stay-at-home order, started March 21, 2020).</li>
+                <li>D3.js version 7. <a href="https://d3js.org">Link</a></li>
+                <li>Our Labs 4-5 code from CMSC471 (tooltip and chart setup).</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="tooltip" style="display:none"></div>
+
+    <!-- Load D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Our files. state.js first because the others use it, main.js last because it starts everything. -->
+    <script src="js/state.js"></script>
+    <script src="js/tooltip.js"></script>
+    <script src="js/controls.js"></script>
+    <script src="js/trendView.js"></script>
+    <script src="js/changeView.js"></script>
+    <script src="js/heatmapView.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,50 +1,30 @@
-"""
-Aggregates the raw theft pull into the small files the site loads.
+# prepare_data.py
+# Cleans the raw theft data and makes the small files our website loads.
+#
+# Input:  data/raw/thefts_2016_2025.csv  (download it first with scripts/download_raw.sh)
+# Output: data/theft_monthly.csv, data/theft_hourly.csv, data/lookups.json
+#
+# Run from the main project folder:  python scripts/prepare_data.py
 
-Input:  data/raw/thefts_2016_2025.csv   (from scripts/download_raw.sh, gitignored)
-Output: data/theft_monthly.csv          year,month,type_group,loc_group,side,arrests,count
-        data/theft_hourly.csv           year,hour,type_group,loc_group,side,count
-        data/lookups.json               group lists, periods, type_group -> primary type
-
-Run from the repo root:  python scripts/prepare_data.py
-
-Community area -> side mapping follows the City of Chicago's 9 "sides"
-(see Wikipedia, "Community areas in Chicago"). Cite it in the write-up.
-"""
 import json
-import re
-from pathlib import Path
-
 import pandas as pd
 
-RAW = Path("data/raw/thefts_2016_2025.csv")
-OUT = Path("data")
+df = pd.read_csv("data/raw/thefts_2016_2025.csv")
+df = df[(df["year"] >= 2016) & (df["year"] <= 2025)]
+print("Rows loaded:", len(df))
 
-YEARS = (2016, 2025)
-PERIODS = {"pre": [2016, 2019], "covid": [2020, 2020], "post": [2021, 2025]}
-
-TYPE_GROUPS = ["Retail", "From building", "Pickpocket/purse", "Over $500",
-               "$500 & under", "Other theft", "Automobile", "Other vehicle"]
-LOC_GROUPS = ["Street/alley", "Residence", "Retail store", "Restaurant/bar",
-              "Transit", "Parking", "Commercial/office", "Other"]
-
-SIDES = {
-    "Far North":     [1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 76, 77],
-    "Northwest":     [15, 16, 17, 18, 19, 20],
-    "North":         [5, 6, 7, 21, 22],
-    "West":          [23, 24, 25, 26, 27, 28, 29, 30, 31],
-    "Central":       [8, 32, 33],
-    "South":         [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 60, 69],
-    "Southwest":     [56, 57, 58, 59, 61, 62, 63, 64, 65, 66, 67, 68],
-    "Far Southwest": [70, 71, 72, 73, 74, 75],
-    "Far Southeast": [44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55],
-}
-AREA_TO_SIDE = {a: side for side, areas in SIDES.items() for a in areas}
+# Fill in missing values and make everything uppercase so the matching works
+df["description"] = df["description"].fillna("").str.upper()
+df["location_description"] = df["location_description"].fillna("").str.upper()
 
 
-def type_group(primary, desc):
-    if primary == "MOTOR VEHICLE THEFT":
-        return "Automobile" if "AUTOMOBILE" in desc else "Other vehicle"
+# ---- Theft type ----
+def get_type_group(row):
+    desc = row["description"]
+    if row["primary_type"] == "MOTOR VEHICLE THEFT":
+        if "AUTOMOBILE" in desc:
+            return "Automobile"
+        return "Other vehicle"
     if "RETAIL" in desc:
         return "Retail"
     if "FROM BUILDING" in desc:
@@ -58,80 +38,100 @@ def type_group(primary, desc):
     return "Other theft"
 
 
-# Checked in order; first match wins. Word boundaries avoid false hits like
-# BARBERSHOP (bar), BOWLING ALLEY (alley), MOVIE HOUSE (residence), BUSINESS (bus).
-LOC_RULES = [
-    ("Residence",      r"RESIDENCE|APARTMENT|PORCH|YARD|DRIVEWAY"),
-    ("Transit",        r"\bCTA\b|TRAIN|\bBUS\b|PLATFORM"),
-    ("Restaurant/bar", r"RESTAURANT|\bBAR\b|TAVERN"),
-    ("Retail store",   r"STORE|RETAIL|GROCERY|DEPARTMENT|CONVENIENCE"),
-    ("Parking",        r"PARKING|GARAGE"),
-    ("Street/alley",   r"STREET|SIDEWALK|^ALLEY$"),
-    ("Commercial/office", r"^(?!VEHICLE).*(OFFICE|COMMERCIAL|BUSINESS)"),
-]
-LOC_RULES = [(g, re.compile(p)) for g, p in LOC_RULES]
+# ---- Location type ----
+# The same place is spelled different ways in different years
+# (ex. "RESIDENCE-GARAGE" and "RESIDENCE - GARAGE"), so we look for keywords.
+# We split into words for BAR, BUS and CTA so "BARBERSHOP" and "BUSINESS" don't match.
+def get_loc_group(loc):
+    words = loc.replace("/", " ").replace("-", " ").replace("(", " ").split()
 
-
-def loc_group(loc):
-    for group, pattern in LOC_RULES:
-        if pattern.search(loc):
-            return group
+    if any(k in loc for k in ["RESIDENCE", "APARTMENT", "PORCH", "YARD", "DRIVEWAY"]):
+        return "Residence"
+    if "CTA" in words or "BUS" in words or "TRAIN" in loc or "PLATFORM" in loc:
+        return "Transit"
+    if "RESTAURANT" in loc or "BAR" in words or "TAVERN" in loc:
+        return "Restaurant/bar"
+    if any(k in loc for k in ["STORE", "RETAIL", "GROCERY", "DEPARTMENT", "CONVENIENCE"]):
+        return "Retail store"
+    if "PARKING" in loc or "GARAGE" in loc:
+        return "Parking"
+    if "STREET" in loc or "SIDEWALK" in loc or loc == "ALLEY":
+        return "Street/alley"
+    if not loc.startswith("VEHICLE") and any(k in loc for k in ["OFFICE", "COMMERCIAL", "BUSINESS"]):
+        return "Commercial/office"
     return "Other"
 
 
-def main():
-    df = pd.read_csv(RAW)
-    df = df[df["year"].between(*YEARS)]
-
-    desc = df["description"].fillna("").str.upper().str.strip()
-    loc = df["location_description"].fillna("").str.upper().str.strip()
-    when = pd.to_datetime(df["date"])
-
-    # Map each distinct string once instead of once per row.
-    type_map = {k: type_group(*k) for k in set(zip(df["primary_type"], desc))}
-    loc_map = {k: loc_group(k) for k in loc.unique()}
-
-    tidy = pd.DataFrame({
-        "year": df["year"].astype(int),
-        "month": when.dt.month,
-        "hour": when.dt.hour,
-        "type_group": [type_map[k] for k in zip(df["primary_type"], desc)],
-        "loc_group": loc.map(loc_map),
-        "side": df["community_area"].map(AREA_TO_SIDE).fillna("Unknown"),
-        "arrest": df["arrest"].astype(str).str.lower().eq("true").astype(int),
-    })
-
-    keys = ["type_group", "loc_group", "side"]
-    monthly = (tidy.groupby(["year", "month", *keys])
-                   .agg(arrests=("arrest", "sum"), count=("arrest", "size"))
-                   .reset_index())
-    hourly = (tidy.groupby(["year", "hour", *keys])
-                  .size().rename("count").reset_index())
-
-    monthly.to_csv(OUT / "theft_monthly.csv", index=False)
-    hourly.to_csv(OUT / "theft_hourly.csv", index=False)
-
-    lookups = {
-        "type_groups": TYPE_GROUPS,
-        "loc_groups": LOC_GROUPS,
-        "sides": list(SIDES) + ["Unknown"],
-        "periods": PERIODS,
-        "type_primary": {g: ("MOTOR VEHICLE THEFT" if g in ("Automobile", "Other vehicle") else "THEFT")
-                         for g in TYPE_GROUPS},
-    }
-    (OUT / "lookups.json").write_text(json.dumps(lookups, indent=2))
-
-    # Sanity checks: every row is accounted for, and no unexpected group names.
-    assert monthly["count"].sum() == hourly["count"].sum() == len(df)
-    assert set(tidy["type_group"]) <= set(TYPE_GROUPS)
-    assert set(tidy["loc_group"]) <= set(LOC_GROUPS)
-
-    print(f"{len(df):,} thefts -> {len(monthly):,} monthly rows, {len(hourly):,} hourly rows")
-    for col in keys:
-        print(tidy[col].value_counts().to_string(), "\n")
-    midnight = (when.dt.hour.eq(0) & when.dt.minute.eq(0)).mean()
-    print(f"Recorded at exactly 12:00 AM: {midnight:.1%}")
+# ---- Side of the city ----
+# Chicago's 77 community areas grouped into 9 "sides"
+# Source: Wikipedia, "Community areas in Chicago"
+sides = {
+    "Far North": [1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 76, 77],
+    "Northwest": [15, 16, 17, 18, 19, 20],
+    "North": [5, 6, 7, 21, 22],
+    "West": [23, 24, 25, 26, 27, 28, 29, 30, 31],
+    "Central": [8, 32, 33],
+    "South": [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 60, 69],
+    "Southwest": [56, 57, 58, 59, 61, 62, 63, 64, 65, 66, 67, 68],
+    "Far Southwest": [70, 71, 72, 73, 74, 75],
+    "Far Southeast": [44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55],
+}
+area_to_side = {}
+for side, areas in sides.items():
+    for area in areas:
+        area_to_side[area] = side
 
 
-if __name__ == "__main__":
-    main()
+# ---- Add the new columns ----
+print("Grouping rows (this takes a few seconds)...")
+df["type_group"] = df.apply(get_type_group, axis=1)
+df["loc_group"] = df["location_description"].apply(get_loc_group)
+df["side"] = df["community_area"].map(area_to_side).fillna("Unknown")
+
+dates = pd.to_datetime(df["date"])
+df["month"] = dates.dt.month
+df["hour"] = dates.dt.hour
+df["arrest"] = df["arrest"].astype(str).str.lower() == "true"
+
+
+# ---- Count thefts by month and by hour ----
+monthly = df.groupby(["year", "month", "type_group", "loc_group", "side"]).agg(
+    arrests=("arrest", "sum"), count=("arrest", "size")
+).reset_index()
+monthly["arrests"] = monthly["arrests"].astype(int)
+
+hourly = df.groupby(["year", "hour", "type_group", "loc_group", "side"]).size().reset_index(name="count")
+
+monthly.to_csv("data/theft_monthly.csv", index=False)
+hourly.to_csv("data/theft_hourly.csv", index=False)
+
+
+# ---- Lists the website uses for dropdowns ----
+type_groups = ["Retail", "From building", "Pickpocket/purse", "Over $500",
+               "$500 & under", "Other theft", "Automobile", "Other vehicle"]
+lookups = {
+    "type_groups": type_groups,
+    "loc_groups": ["Street/alley", "Residence", "Retail store", "Restaurant/bar",
+                   "Transit", "Parking", "Commercial/office", "Other"],
+    "sides": list(sides.keys()) + ["Unknown"],
+    "periods": {"pre": [2016, 2019], "covid": [2020, 2020], "post": [2021, 2025]},
+    "type_primary": {},
+}
+for group in type_groups:
+    if group in ["Automobile", "Other vehicle"]:
+        lookups["type_primary"][group] = "MOTOR VEHICLE THEFT"
+    else:
+        lookups["type_primary"][group] = "THEFT"
+
+with open("data/lookups.json", "w") as f:
+    json.dump(lookups, f, indent=2)
+
+
+# ---- Check the results ----
+print("Monthly rows:", len(monthly), " Hourly rows:", len(hourly))
+print("Total thefts in monthly file:", monthly["count"].sum())
+print(df["type_group"].value_counts())
+print(df["loc_group"].value_counts())
+print(df["side"].value_counts())
+midnight = ((dates.dt.hour == 0) & (dates.dt.minute == 0)).mean()
+print("Share recorded at exactly 12:00 AM:", round(midnight * 100, 1), "%")

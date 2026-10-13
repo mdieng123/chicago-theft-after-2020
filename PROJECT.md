@@ -1,6 +1,6 @@
 # PROJECT.md — Chicago Theft After 2020
 
-> **For AI assistants:** This file is the team's shared contract. Follow it exactly. Only edit the files your human owner is assigned (see "Ownership"). If a change to a shared file (`state.js`, `tooltip.js`, `style.css`, data files) seems necessary, describe it to your human instead of making it.
+> **For AI assistants:** This file is the team's shared contract. Follow it exactly. **Write code like our Labs 4-5 (`reference/lab4-5/js/script.js`)**: plain `<script>` files with global functions, `d3.csv().then()`, `.on('mouseover')` tooltips, simple loops and comments. No ES modules, classes, build tools or fancy syntax. Keep it at the level of an intro visualization class. Only edit the files your human owner is assigned (see "Ownership"). If a change to a shared file (`state.js`, `tooltip.js`, `style.css`, data files) seems necessary, describe it to your human instead of making it.
 
 ## Question
 **How did Chicago theft patterns shift after 2020?**
@@ -103,8 +103,9 @@ year,hour,type_group,loc_group,side,count
 All numbers shown on the page must be computed from these files. Nothing is hardcoded.
 
 ## Tech
-- D3 v7 from CDN, loaded once in `index.html`: `https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js` (a global `d3`; don't import it in modules)
-- Plain ES modules with no build step and no other libraries unless the team agrees
+- D3 v7, loaded once in `index.html` with `<script src="https://d3js.org/d3.v7.min.js"></script>` (same as the labs)
+- Plain JavaScript files loaded with `<script>` tags, like the labs. No modules, build step or other libraries unless the team agrees.
+- Every file shares the same global scope, so **start your global variable names with your view's name** (e.g. `trendSvg`, `changeSvg`, `heatmapSvg`) so they don't clash.
 - Local dev: `python -m http.server`, then open `localhost:8000`
 - Deployed with GitHub Pages from `main` (root)
 
@@ -127,55 +128,51 @@ LOG.md                  all (hours and AI usage, append-only)
 
 ## Shared APIs
 
-### `js/state.js`
+### `js/state.js` (A)
+Global variables and functions every file can use:
 ```js
-// Default filters; null means "all"
-export const filters = {
-  yearRange: [2016, 2025],
-  primaryTypes: ['THEFT', 'MOTOR VEHICLE THEFT'],
-  typeGroups: null,   // array of type_group strings or null
-  locGroups: null,
-  sides: null,
-};
+allMonthly   // every row of theft_monthly.csv
+allHourly    // every row of theft_hourly.csv
+lookups      // lookups.json (lists for dropdowns, periods, type_primary)
 
-export function setFilters(patch) { /* shallow-merge, then notify listeners */ }
-export function resetFilters() { /* restore defaults, then notify */ }
-export function onChange(fn) { /* fn(filters) is called after every change */ }
+filters = {
+  startYear: 2016,
+  endYear: 2025,
+  showTheft: true,     // Theft checkbox
+  showVehicle: true,   // Motor vehicle theft checkbox
+  typeGroup: 'All',    // 'All' or one type_group
+  locGroup: 'All',     // 'All' or one loc_group
+  side: 'All'          // 'All' or one side
+}
 
-// Returns the rows matching the current filters.
-// `ignore` lists filter keys to skip, so a view can avoid filtering on its own
-// dimension (e.g. View 2 passes ['typeGroups'] when showing type bars).
-export function applyFilters(rows, { ignore = [] } = {}) { ... }
+filterData(rows, ignore)  // rows that match the filters; ignore = 'years', 'typeGroup' or 'locGroup' (optional)
+updateAll()               // redraws every chart; call it after changing filters
+resetFilters()            // back to defaults, then redraws
 ```
+To change a filter: set it, then call `updateAll()`. Example: `filters.typeGroup = 'Retail'; updateAll();`
 
-### View contract
-Every view module exports:
+Every row also has a `primary` field (`THEFT` or `MOTOR VEHICLE THEFT`) that `main.js` adds when the data loads.
+
+### Each view
+Each view file has two functions. `main.js` calls the init function once, and `updateAll()` calls the update function every time a filter changes:
+
+| File | Functions | `update` gets |
+|---|---|---|
+| `controls.js` (B) | `initControls()`, `updateControls(data)` | filtered monthly rows |
+| `trendView.js` (A) | `initTrend()`, `updateTrend(data)` | filtered monthly rows |
+| `changeView.js` (B) | `initChange()`, `updateChange(data)` | filtered monthly rows |
+| `heatmapView.js` (C) | `initHeatmap()`, `updateHeatmap(data)` | filtered hourly rows |
+
+- If you need rows without one filter (e.g. View 2 still showing every bar), use `filterData(allMonthly, 'typeGroup')`.
+- Each view has a caption element in `index.html` (`#trend-caption`, `#change-caption`, `#heatmap-caption`). Write the main takeaway there, computed from the data.
+- `controls.js`, `changeView.js` and `heatmapView.js` start as placeholders. Replace them but keep the same function names.
+
+### `js/tooltip.js` (C)
 ```js
-export function init(containerSelector, data, lookups) {}
-export function update(filteredData) {}
+showTooltip(event, html)  // shows the #tooltip div next to the mouse with this html
+hideTooltip()
 ```
-`main.js` calls `init` once and `update` on every `onChange`. Views never load data themselves.
-
-- `data` (passed to `init`) is `{ monthly, hourly }`: every row of each CSV, with numbers already parsed. Keep it if you need unfiltered rows (e.g. for the `pre` baseline or `applyFilters(rows, { ignore: [...] })`).
-- `filteredData` (passed to `update`) is `{ monthly, hourly }` after `applyFilters` with all current filters.
-- On load, `main.js` adds two fields to every row: `primary` (`THEFT` or `MOTOR VEHICLE THEFT`, from `lookups.type_primary`) and `period` (`pre`, `covid` or `post`).
-- Read the current filters with `import { filters } from './state.js'` (e.g. to highlight selected bars). Change them only with `setFilters` / `resetFilters`.
-- Each view section in `index.html` has a caption element (`#trend-caption`, `#change-caption`, `#heatmap-caption`). Write the takeaway there, computed from the data.
-
-`controls.js`, `changeView.js` and `heatmapView.js` start as stubs, and `tooltip.js` as a basic working version, so the page runs end to end from day one. Their owners replace them, keeping the same exports.
-
-### `js/tooltip.js`
-```js
-export function show(event, { title, rows }) {}  // rows: [[label, value], ...]
-export function move(event) {}
-export function hide() {}
-```
-Tooltip content convention, in this order:
-1. Title
-2. Count
-3. Share of current selection
-4. Change vs `pre` average (signed %)
-5. Arrest rate, when available
+Tooltip content, in this order: title (bold), count, share of the current selection, change vs the 2016–19 average, arrest rate (when available).
 
 ## Views
 
@@ -185,6 +182,7 @@ Tooltip content convention, in this order:
 - A dashed line marks the March 2020 stay-at-home order.
 - A dashed horizontal line shows the `pre` monthly average.
 - Tooltip on hover (snap to the nearest month).
+- Drag across the chart (brush) to set the year range for every view.
 
 **View 2, what changed (B)**
 - Diverging horizontal bar chart: % change in average annual count, `pre` → `post`, sorted by change.
@@ -201,7 +199,7 @@ Tooltip content convention, in this order:
 **Controls (B)**, a panel above the views:
 - year range (two selects or a dual slider)
 - Theft / Motor vehicle theft checkboxes
-- type group and location group multi-selects
+- type group and location group dropdowns ('All' + each group)
 - side dropdown
 - Reset button
 - A visible summary line, e.g. "Showing 412,903 thefts · 2016–2025 · All types · All sides"
@@ -218,10 +216,9 @@ Tooltip content convention, in this order:
   --color-muted: #6b7280;
   --color-bg:    #ffffff;
   --color-grid:  #e5e7eb;
-  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --chart-width: 900px;
 }
 ```
+- Font: Arial (like the labs). Charts are 900px wide.
 - Heatmap scale: `d3.interpolateYlOrRd`.
 - Number format: `d3.format(',')` for counts, `d3.format('+.0%')` for change.
 - Every chart needs a title, axis labels with units, and a one-sentence caption stating the takeaway.
@@ -240,5 +237,5 @@ C edits all sections into one voice.
 ## Team rules
 1. Commit small and often, and open a PR for anything that touches a shared file.
 2. Integrate early. All three views should be linked through `state.js`, even if they're ugly, before anyone polishes.
-3. Log hours and AI usage in `LOG.md` as you go, e.g. `2026-10-14 | B | 2.0h | controls.js | used Claude to scaffold multi-select`.
+3. Log hours and AI usage in `LOG.md` as you go, e.g. `2026-10-14 | B | 2.0h | controls.js | used Claude to help write the dropdowns`.
 4. Before merging, test with at least two filter combinations and check that the console has no errors.

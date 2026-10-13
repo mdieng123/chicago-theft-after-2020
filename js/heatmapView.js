@@ -1,11 +1,10 @@
-// STUB — Person C replaces this file with View 3 (see PROJECT.md "Views").
-// It only proves the view receives filtered data.
-let note;
+// heatmapView.js (Person C)
+// PLACEHOLDER: Person C replaces this with View 3 (heatmap of year by hour of day).
 
-export function init(containerSelector) {
-  note = d3.select(containerSelector).append('p').attr('class', 'stub');
+function initHeatmap() {
+  d3.select('#view-heatmap').append('p').attr('class', 'placeholder');
 }
 
-export function update(filteredData) {
-  note.text(`View 3 placeholder (Person C): receiving ${d3.format(',')(filteredData.hourly.length)} hourly rows.`);
+function updateHeatmap(data) {
+  d3.select('#view-heatmap .placeholder').text('View 3 goes here (Person C). Getting ' + data.length + ' hourly rows.');
 }
