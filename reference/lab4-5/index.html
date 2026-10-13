@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labs 4 & 5: Interactive Data Visualization with D3.js</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    
+    <div class="container"> <!-- Centers content and sets max width -->
+        <h1>Labs 4 & 5: Interactive Data Visualization with D3.js</h1>
+        <section>
+            <h3>About the Dataset</h3>
+            <p>This visualization uses Gapminder data to explore global development indicators across countries and years.</p>
+            <h3>How to Use</h3>
+            <p>Select variables using the dropdown menus, adjust the year slider, and hover over bubbles for country details.</p>
+            <h3>Dataset Insight</h3>
+            <p>Countries with higher income per person generally tend to have higher life expectancy.</p>
+        </section>
+        <div class="controls">
+           <!-- Slider -->
+            <p id="value"></p>
+            <div id="slider"></div>
+            <!-- Three dropdown buttons -->
+            X: <select id="xVariable" class="variable"></select>
+            Y: <select id="yVariable" class="variable"></select>
+            size: <select id="sizeVariable" class="variable"></select>
+        </div>
+        
+        <div id="vis"></div> <!--  Will hold our visualization (SVG) -->
+      
+    </div>
+    
+    <div id="tooltip" style="display:none"></div> 
+    
+    <!-- Load D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
