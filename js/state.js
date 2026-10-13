@@ -19,17 +19,16 @@ const defaultFilters = {
 let filters = { ...defaultFilters };
 
 // Returns only the rows that match the current filters.
-// ignore (optional): the name of one filter to skip.
-//   'years'     -> used by View 1 for the 2016-19 average, so it doesn't change when you zoom
-//   'typeGroup' -> used by View 2 so it can still show every type bar
-//   'locGroup'  -> same idea for the location bars
-function filterData(rows, ignore) {
+// ignore (optional): a list of filters to skip, for example:
+//   ['years']              -> View 1 uses this for the 2016-19 average, so it doesn't change when you zoom
+//   ['years', 'typeGroup'] -> View 2 can use this to compare before vs after and still show every type bar
+function filterData(rows, ignore = []) {
   return rows.filter(d => {
-    if (ignore !== 'years' && (d.year < filters.startYear || d.year > filters.endYear)) return false;
+    if (!ignore.includes('years') && (d.year < filters.startYear || d.year > filters.endYear)) return false;
     if (d.primary === 'THEFT' && !filters.showTheft) return false;
     if (d.primary === 'MOTOR VEHICLE THEFT' && !filters.showVehicle) return false;
-    if (ignore !== 'typeGroup' && filters.typeGroup !== 'All' && d.type_group !== filters.typeGroup) return false;
-    if (ignore !== 'locGroup' && filters.locGroup !== 'All' && d.loc_group !== filters.locGroup) return false;
+    if (!ignore.includes('typeGroup') && filters.typeGroup !== 'All' && d.type_group !== filters.typeGroup) return false;
+    if (!ignore.includes('locGroup') && filters.locGroup !== 'All' && d.loc_group !== filters.locGroup) return false;
     if (filters.side !== 'All' && d.side !== filters.side) return false;
     return true;
   });

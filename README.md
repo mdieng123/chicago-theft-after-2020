@@ -8,6 +8,21 @@ An interactive D3 visualization with three linked views (monthly trend, what cha
 - **Log your work in [`LOG.md`](LOG.md)** every session (hours and AI usage).
 - **Past lab for reference:** [`reference/lab4-5/`](reference/lab4-5/) (Gapminder bubble chart: d3.csv loading, dropdowns, slider, tooltips, join/transitions). Reference only; the project code lives at the repo root.
 
+## Status (October 13, 2026): where to pick up
+**Person A is done:** data, page, shared filters (`js/state.js`), loading (`js/main.js`), View 1 (`js/trendView.js`, line chart with tooltip and drag-to-zoom), and the A parts of the write-up. Live site: https://mdieng123.github.io/chicago-theft-after-2020/
+
+**Person B, next:**
+1. `js/controls.js`: replace the placeholder with the real filters (year range, Theft / Motor vehicle checkboxes, type, location and side dropdowns, Reset, summary line).
+2. `js/changeView.js`: replace the placeholder with View 2 (bars of % change before vs after, click a bar to filter).
+3. Write the View 2 and Filters parts of the write-up in `index.html`.
+
+**Person C, next:**
+1. `js/heatmapView.js`: replace the placeholder with View 3 (year by hour heatmap, midnight marked as unreliable).
+2. Polish `css/style.css` and `js/tooltip.js` (basic versions are already there and working). Keep it plain like the labs.
+3. Write the View 3 part of the write-up, edit the whole write-up into one voice, record the demo video.
+
+**For everyone's AI assistant:** read `PROJECT.md` first and copy the style of `js/trendView.js` and `reference/lab4-5/js/script.js`. Keep the function names from the placeholders. Test with a few filters and check the console for errors before pushing. Add a line to `LOG.md` for every work session.
+
 ## Team
 | Person | Owns |
 |---|---|
@@ -33,6 +48,6 @@ You only need to do this if the cleaning rules change. The output files are alre
 
 ## Run locally
 ```bash
-python -m http.server
+python3 -m http.server
 ```
 Then open http://localhost:8000.

@@ -145,7 +145,7 @@ filters = {
   side: 'All'          // 'All' or one side
 }
 
-filterData(rows, ignore)  // rows that match the filters; ignore = 'years', 'typeGroup' or 'locGroup' (optional)
+filterData(rows, ignore) // rows that match the filters; ignore (optional) = list of filters to skip: 'years', 'typeGroup', 'locGroup'
 updateAll()               // redraws every chart; call it after changing filters
 resetFilters()            // back to defaults, then redraws
 ```
@@ -163,7 +163,8 @@ Each view file has two functions. `main.js` calls the init function once, and `u
 | `changeView.js` (B) | `initChange()`, `updateChange(data)` | filtered monthly rows |
 | `heatmapView.js` (C) | `initHeatmap()`, `updateHeatmap(data)` | filtered hourly rows |
 
-- If you need rows without one filter (e.g. View 2 still showing every bar), use `filterData(allMonthly, 'typeGroup')`.
+- If you need rows without some filters, pass them in `ignore`. **View 2 must use `filterData(allMonthly, ['years', 'typeGroup'])`** (or `'locGroup'` in location mode). Otherwise zooming View 1 to e.g. 2022-2024 removes the 2016-2019 rows and View 2 can't compare.
+- **The View 1 brush and the Reset button also change `filters`.** So `updateControls(data)` must set every dropdown/checkbox from `filters` each time it runs, or the controls will show the wrong values.
 - Each view has a caption element in `index.html` (`#trend-caption`, `#change-caption`, `#heatmap-caption`). Write the main takeaway there, computed from the data.
 - `controls.js`, `changeView.js` and `heatmapView.js` start as placeholders. Replace them but keep the same function names.
 
@@ -205,17 +206,11 @@ Tooltip content, in this order: title (bold), count, change vs the 2016-2019 ave
 ## Style tokens (`css/style.css`)
 ```css
 :root {
-  --color-pre:   #4C78A8;
-  --color-covid: #9D9D9D;
-  --color-post:  #E45756;
-  --color-increase: #E45756;
-  --color-decrease: #4C78A8;
-  --color-text:  #1f2328;
-  --color-muted: #6b7280;
-  --color-bg:    #ffffff;
-  --color-grid:  #e5e7eb;
+  --color-pre: #4C78A8;   /* blue: before 2020, and "went down" in View 2 */
+  --color-post: #E45756;  /* red: after 2020, and "went up" in View 2 */
 }
 ```
+In D3 code you can just use the hex values directly (e.g. `.style('fill', '#E45756')`).
 - Keep the page plain like the labs: Arial, black text, little bold, no fancy styling. Charts are 800px wide with a 1px #ccc border (already in style.css), bold axis labels, default D3 axes.
 - Heatmap scale: `d3.interpolateYlOrRd`.
 - Number format: `d3.format(',')` for counts, `d3.format('+.0%')` for change.

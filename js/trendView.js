@@ -48,7 +48,7 @@ function updateTrend(data) {
 
   // Average per month before and after.
   // We ignore the year filter here so the average line doesn't move when you zoom in.
-  let allYears = filterData(allMonthly, 'years');
+  let allYears = filterData(allMonthly, ['years']);
   preAverage = d3.sum(allYears.filter(d => d.year <= 2019), d => d.count) / 48;  // 4 years * 12 months
   let postAverage = d3.sum(allYears.filter(d => d.year >= 2021), d => d.count) / 60; // 5 years * 12 months
 
