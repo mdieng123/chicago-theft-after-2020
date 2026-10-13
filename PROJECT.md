@@ -172,16 +172,14 @@ Each view file has two functions. `main.js` calls the init function once, and `u
 showTooltip(event, html)  // shows the #tooltip div next to the mouse with this html
 hideTooltip()
 ```
-Tooltip content, in this order: title (bold), count, share of the current selection, change vs the 2016–19 average, arrest rate (when available).
+Tooltip content, in this order: title (bold), count, change vs the 2016-2019 average, arrest rate (when available). Keep it short.
 
 ## Views
 
 **View 1, monthly trend (A)**
-- Line chart of monthly counts, 2016–2025.
-- Background bands shade the `pre`, `covid` and `post` periods.
+- Steelblue line with a small dot per month, 2016–2025. Hover a dot for the tooltip.
 - A dashed line marks the March 2020 stay-at-home order.
-- A dashed horizontal line shows the `pre` monthly average.
-- Tooltip on hover (snap to the nearest month).
+- A dashed horizontal line shows the 2016-2019 monthly average.
 - Drag across the chart (brush) to set the year range for every view.
 
 **View 2, what changed (B)**
@@ -218,7 +216,7 @@ Tooltip content, in this order: title (bold), count, share of the current select
   --color-grid:  #e5e7eb;
 }
 ```
-- Font: Arial (like the labs). Charts are 900px wide.
+- Keep the page plain like the labs: Arial, black text, little bold, no fancy styling. Charts are 800px wide with a 1px #ccc border (already in style.css), bold axis labels, default D3 axes.
 - Heatmap scale: `d3.interpolateYlOrRd`.
 - Number format: `d3.format(',')` for counts, `d3.format('+.0%')` for change.
 - Every chart needs a title, axis labels with units, and a one-sentence caption stating the takeaway.
