@@ -1,0 +1,120 @@
+/* Owner: C. A seeded the shared tokens (from PROJECT.md) and a base layout so the views
+   render consistently from day one. C owns everything below and can restyle freely. */
+:root {
+  --color-pre:   #4C78A8;
+  --color-covid: #9D9D9D;
+  --color-post:  #E45756;
+  --color-increase: #E45756;
+  --color-decrease: #4C78A8;
+  --color-text:  #1f2328;
+  --color-muted: #6b7280;
+  --color-bg:    #ffffff;
+  --color-grid:  #e5e7eb;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --chart-width: 900px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 16px 64px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: 1.55;
+}
+
+main, .page-header {
+  max-width: var(--chart-width);
+  margin: 0 auto;
+}
+
+.page-header { padding: 40px 0 8px; }
+.page-header h1 { margin: 0 0 8px; font-size: 2rem; line-height: 1.2; }
+.lede { margin: 0; color: var(--color-muted); font-size: 1.05rem; }
+
+/* Filter panel (B) */
+.controls {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-grid);
+}
+.controls .summary { margin: 0; flex: 1; font-weight: 600; }
+
+button {
+  font: inherit;
+  padding: 6px 14px;
+  border: 1px solid var(--color-grid);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+button:hover { border-color: var(--color-muted); }
+
+/* Views */
+.view { margin: 40px 0; }
+.view h2 { margin: 0 0 4px; font-size: 1.3rem; }
+.caption { margin: 0 0 12px; color: var(--color-text); }
+.hint { margin: 4px 0 0; font-size: 0.85rem; color: var(--color-muted); }
+.view svg { display: block; width: 100%; height: auto; overflow: visible; }
+.stub { padding: 32px; border: 1px dashed var(--color-grid); color: var(--color-muted); text-align: center; }
+
+/* Shared chart anatomy */
+.axis text { fill: var(--color-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.axis path, .axis line { stroke: var(--color-grid); }
+.axis-label { fill: var(--color-muted); font-size: 12px; }
+.grid line { stroke: var(--color-grid); stroke-width: 1; }
+
+/* View 1 (A) */
+.band rect { fill-opacity: 0.08; }
+.band-pre rect   { fill: var(--color-pre); }
+.band-covid rect { fill: var(--color-covid); fill-opacity: 0.14; }
+.band-post rect  { fill: var(--color-post); }
+.band-label { fill: var(--color-muted); font-size: 12px; font-weight: 600; }
+
+.trend-line { fill: none; stroke: var(--color-text); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+
+.ref line { stroke: var(--color-muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.ref text { fill: var(--color-muted); font-size: 12px; }
+
+.focus .crosshair { stroke: var(--color-muted); stroke-width: 1; }
+.focus circle { fill: var(--color-text); stroke: var(--color-bg); stroke-width: 2; }
+
+.brush .selection { fill: var(--color-muted); fill-opacity: 0.15; stroke: none; }
+
+/* Tooltip (C) */
+.tooltip {
+  position: fixed;
+  z-index: 10;
+  display: none;
+  min-width: 180px;
+  padding: 8px 10px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-grid);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
+  font-size: 13px;
+  pointer-events: none;
+}
+.tooltip-title { font-weight: 600; margin-bottom: 4px; }
+.tooltip-row { display: flex; justify-content: space-between; gap: 16px; color: var(--color-muted); }
+.tooltip-row b { color: var(--color-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Write-up */
+.writeup { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--color-grid); }
+.writeup h2 { font-size: 1.5rem; }
+.writeup h3 { margin-top: 32px; }
+.todo { color: var(--color-muted); font-style: italic; }
+.writeup li { margin-bottom: 4px; }
+
+/* Halo so reference labels stay readable where the line crosses them */
+.ref text, .band-label { paint-order: stroke; stroke: var(--color-bg); stroke-width: 4px; stroke-linejoin: round; }

@@ -103,7 +103,7 @@ year,hour,type_group,loc_group,side,count
 All numbers shown on the page must be computed from these files. Nothing is hardcoded.
 
 ## Tech
-- D3 v7 from CDN: `https://cdn.jsdelivr.net/npm/d3@7`
+- D3 v7 from CDN, loaded once in `index.html`: `https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js` (a global `d3`; don't import it in modules)
 - Plain ES modules with no build step and no other libraries unless the team agrees
 - Local dev: `python -m http.server`, then open `localhost:8000`
 - Deployed with GitHub Pages from `main` (root)
@@ -154,7 +154,15 @@ Every view module exports:
 export function init(containerSelector, data, lookups) {}
 export function update(filteredData) {}
 ```
-`main.js` calls `init` once and `update` on every `onChange`.
+`main.js` calls `init` once and `update` on every `onChange`. Views never load data themselves.
+
+- `data` (passed to `init`) is `{ monthly, hourly }`: every row of each CSV, with numbers already parsed. Keep it if you need unfiltered rows (e.g. for the `pre` baseline or `applyFilters(rows, { ignore: [...] })`).
+- `filteredData` (passed to `update`) is `{ monthly, hourly }` after `applyFilters` with all current filters.
+- On load, `main.js` adds two fields to every row: `primary` (`THEFT` or `MOTOR VEHICLE THEFT`, from `lookups.type_primary`) and `period` (`pre`, `covid` or `post`).
+- Read the current filters with `import { filters } from './state.js'` (e.g. to highlight selected bars). Change them only with `setFilters` / `resetFilters`.
+- Each view section in `index.html` has a caption element (`#trend-caption`, `#change-caption`, `#heatmap-caption`). Write the takeaway there, computed from the data.
+
+`controls.js`, `changeView.js` and `heatmapView.js` start as stubs, and `tooltip.js` as a basic working version, so the page runs end to end from day one. Their owners replace them, keeping the same exports.
 
 ### `js/tooltip.js`
 ```js
