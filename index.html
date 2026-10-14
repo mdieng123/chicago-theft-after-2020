@@ -89,9 +89,32 @@
             Other options we thought about: a bar chart by year was simpler but hid the 2020 drop and the seasons. A
             stacked area chart by theft type made the total hard to read, and View 2 already shows the theft types.
         </p>
-        <p>View 2: (Person B)</p>
+        <p>
+            View 2 (which thefts went up or down): We used a horizontal bar chart to show which theft types
+            and locations changed the most after 2020. We compared the average yearly thefts in 2016-2019
+            with 2021-2025, leaving out 2020 because of the pandemic. We used yearly averages because the
+            two periods have different numbers of years. Red bars show increases and blue bars show decreases.
+            Horizontal bars also make the category names easier to read.
+        </p>
+        <p>
+            Interactions in View 2: Users can switch between theft type and location type. Hovering over a
+            bar shows more details, and clicking a bar filters the other charts to that category. Clicking
+            the same bar again clears the selection (filtering and linking).
+        </p>
+        <p>
+            Other options we thought about: a pie chart would show the share of each category but not
+            how much it changed. A grouped bar chart would show both periods, but percentage-change bars
+            make it easier to see which categories increased or decreased.
+        </p>
+
         <p>View 3: (Person C)</p>
-        <p>Filters: (Person B)</p>
+        <p>
+            Filters: We added year range, crime category, theft type, location type, and city-side filters
+            so users can explore specific theft patterns. All three charts use the same filters and update
+            together. We also added a summary showing how many thefts match the current selection and a
+            Reset button to return to the original view. This makes it easier to compare patterns without
+            switching between separate pages (dynamic filtering).
+        </p>
 
         <h3>Development Process</h3>
         <p>(Everyone: who did what, about how many hours, and what took the longest. See LOG.md.)</p>
@@ -106,8 +129,15 @@
             <li>Person A: used AI to write the script that downloads the data through the API (after the export kept
                 failing) and the cleaning script, to turn our View 1 design into D3 code, and to help fix bugs. We checked
                 its work by comparing our row counts to the portal's yearly totals, printing every place value to make sure
-                it landed in the right group, and testing the filters in the browser.</li>
-            <li>Person B: (to fill in)</li>
+                it landed in the right group, and testing the filters in the browser.
+            </li>
+
+            <li>Person B: used AI to help implement the interactive filter panel
+                and turn our View 2 design into a D3 bar chart, and to help fix bugs.
+                We checked its work by testing the dropdowns, clicking bars to apply
+                and clear filters, making sure the other charts updated correctly,
+                and checking the browser console for errors.
+            </li>
             <li>Person C: (to fill in)</li>
         </ul>
         <p>
