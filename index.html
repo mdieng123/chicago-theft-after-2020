@@ -24,20 +24,21 @@
         <div id="controls"></div>
 
         <!-- View 1 (Person A) -->
-        <h3>Thefts per month</h3>
-        <p id="trend-caption"></p>
+        <h3 class="view-title">Thefts per month</h3>
+        <p id="trend-caption" class="caption"></p>
         <div id="view-trend"></div>
-        <p id="trend-note"></p>
+        <p id="trend-note" class="note"></p>
 
         <!-- View 2 (Person B) -->
-        <h3>Which thefts went up or down</h3>
-        <p id="change-caption"></p>
+        <h3 class="view-title">Which thefts went up or down</h3>
+        <p id="change-caption" class="caption"></p>
         <div id="view-change"></div>
 
         <!-- View 3 (Person C) -->
-        <h3>Thefts by hour of day</h3>
-        <p id="heatmap-caption"></p>
+        <h3 class="view-title">When thefts happen during the day</h3>
+        <p id="heatmap-caption" class="caption"></p>
         <div id="view-heatmap"></div>
+        <p id="heatmap-note" class="note"></p>
 
         <!-- Write-up -->
         <h2>Write-up</h2>
@@ -107,7 +108,32 @@
             make it easier to see which categories increased or decreased.
         </p>
 
-        <p>View 3: (Person C)</p>
+        <p>
+            View 3 (when thefts happen during the day): We used a heatmap with one row per year and one column per hour,
+            because it shows two things at once: the daily pattern (reading across) and how that pattern changed over the
+            years (reading down). The color is the share of that year's thefts that happened in that hour, not the count.
+            Some years had many more thefts than others, so with counts the busy years would just look darker everywhere and
+            hide the change we care about. We used a yellow-to-red scale because the values only go one way (more or less
+            of the day's thefts). The labels on the right group the rows into before, 2020 and after, in the same blue and
+            red as the other charts.
+        </p>
+        <p>
+            The 12 AM column has stripes because it isn't reliable: when nobody knows when a theft happened, it is usually
+            recorded at 12:00 AM. We left that column out when setting the colors, otherwise its fake spike would make
+            every other hour look pale. The bracket above 1-5 AM points out the main finding: a bigger share of thefts
+            happen overnight after 2020.
+        </p>
+        <p>
+            Interactions in View 3: hovering over a cell shows the number of thefts, its share of the year, and how that
+            share compares to the same hour in 2016-2019 (details on demand). The heatmap follows the shared filters and
+            the View 1 zoom, so you can check whether the overnight shift holds for one type of theft or one part of the
+            city (filtering and linking).
+        </p>
+        <p>
+            Other options we thought about: a line chart with one line per year was too crowded with ten years, and the
+            lines crossed a lot. Two side-by-side bar charts (before vs after) were easier to read but hid how the change
+            built up year by year, and hid 2020.
+        </p>
         <p>
             Filters: We added year range, crime category, theft type, location type, and city-side filters
             so users can explore specific theft patterns. All three charts use the same filters and update
@@ -138,7 +164,10 @@
                 and clear filters, making sure the other charts updated correctly,
                 and checking the browser console for errors.
             </li>
-            <li>Person C: (to fill in)</li>
+            <li>Person C: used AI to turn our View 3 design into a D3 heatmap, to improve the shared tooltip and page
+                layout, and to help fix bugs. We checked its work by recomputing the hourly shares in Python and comparing
+                them to the chart, testing several filter combinations, and checking the browser console for errors.
+            </li>
         </ul>
         <p>
             AI saved a lot of time, but we still had to catch its mistakes. For example, simple keyword matching put

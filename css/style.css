@@ -2,24 +2,55 @@
 
 /* Shared colors so all the charts match */
 :root {
-  --color-pre: #4C78A8;
-  --color-post: #E45756;
+  --color-pre: #4C78A8;  /* blue: before 2020, and "went down" */
+  --color-post: #E45756; /* red: after 2020, and "went up" */
 }
 
 * {
   font-family: Arial, sans-serif;
 }
 
+body {
+  background: white;
+  color: black;
+}
+
 /* Centers content and sets max width */
 .container {
   max-width: 800px;
   margin: 2rem auto;
+  padding: 0 16px;
   line-height: 1.6;
+}
+
+/* Section titles */
+h2 {
+  margin-top: 3rem;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Chart titles: a bit of space above so the views don't run together */
+.view-title {
+  margin-top: 2.5rem;
+  margin-bottom: 0.25rem;
+}
+
+/* One-sentence takeaway above each chart */
+.caption {
+  margin-top: 0;
+}
+
+/* Small notes under the charts */
+.note {
+  font-size: 13px;
+  color: #555;
+  margin-top: 4px;
 }
 
 /* Box around each chart, like in the labs */
 .container svg {
   border: 1px solid #ccc;
+  max-width: 100%;
 }
 
 .axis text {
@@ -31,6 +62,22 @@
   font-weight: bold;
 }
 
+/* Filter panel */
+#controls {
+  border: 1px solid #ccc;
+  padding: 10px 12px 0;
+  margin-bottom: 1rem;
+}
+
+#summary {
+  font-size: 13px;
+  color: #555;
+}
+
+select {
+  margin-right: 4px;
+}
+
 button {
   padding: 8px 16px;
   margin-right: 10px;
@@ -38,10 +85,13 @@ button {
 
 #tooltip {
   position: absolute; /* So we can move it with the cursor */
+  max-width: 260px;
   padding: 10px;
   background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   pointer-events: none; /* So the tooltip doesn't block the mouse */
   font-size: 12px;
+  line-height: 1.5;
 }

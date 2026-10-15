@@ -15,3 +15,5 @@ Format: `date | person | hours | files touched | what you did (and how AI was us
 | 2026-10-13 | B | 3.5h | js/controls.js, js/changeView.js | Implemented interactive filters and View 2 percentage-change bar chart with linked filtering (used ChatGPT to help write D3 code and debug) |
 | 2026-10-14 | B | 2.0h | js/controls.js, js/changeView.js | Tested dropdowns, bar selection and clearing, shared chart updates, and browser console; checked that interactions worked correctly (used ChatGPT to help troubleshoot) |
 | 2026-10-14 | B | 1.0h | index.html, LOG.md | Wrote View 2 and filter design rationale, documented AI usage, and updated work log|
+
+| 2026-10-15 | C | 2.5h | js/heatmapView.js, js/tooltip.js, css/style.css, index.html | Built View 3 heatmap (year by hour, striped 12 AM column, legend, 1-5 AM annotation and caption), kept tooltip on screen, polished layout, wrote View 3 design rationale and AI usage line; tested several filter combos with no console errors (used Claude to write code and test in browser) |
