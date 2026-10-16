@@ -106,9 +106,16 @@ function updateChange() {
     .attr('font-size', 11)
     .text(d => d.change === null ? 'n/a' : fmt(d.change));
 
-  const biggest = valid.reduce((best, d) => !best || d.change > best.change ? d : best, null);
+  // Leave "Other theft" out of the caption: most of its increase is a new description code
+  // ("THEFT FROM MOTOR VEHICLE") that the police started using in 2024, not a real increase.
+  const captionBars = valid.filter(d => d.name !== 'Other theft');
+  const biggest = captionBars.reduce((best, d) => !best || d.change > best.change ? d : best, null);
+  const otherNote = changeMode === 'type_group'
+    ? 'Other theft is left out here because most of its jump is a new "theft from motor vehicle" code used since 2024. '
+    : '';
   d3.select('#change-caption').text(biggest
     ? 'Comparing average annual thefts in 2016–2019 with 2021–2025 (excluding 2020). ' +
-      biggest.name + ' has the largest increase (' + fmt(biggest.change) + '). Click a bar to filter all views; click again to clear.'
+      biggest.name + ' has the largest increase (' + fmt(biggest.change) + '). ' + otherNote +
+      'Click a bar to filter all views; click again to clear.'
     : 'No thefts match the selected filters. Try Reset filters.');
 }

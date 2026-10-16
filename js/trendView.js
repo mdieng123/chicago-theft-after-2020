@@ -97,7 +97,7 @@ function updateTrend(data) {
   // Caption with the main takeaway
   if (preAverage > 0) {
     let change = Math.round((postAverage - preAverage) / preAverage * 100);
-    let changeText = change >= 0 ? 'up ' + change + '%' : 'down ' + (-change) + '%';
+    let changeText = change === 0 ? 'about the same' : change > 0 ? 'up ' + change + '%' : 'down ' + (-change) + '%';
     d3.select('#trend-caption').text(
       'Before 2020 there were about ' + d3.format(',')(Math.round(preAverage)) + ' of these thefts per month. ' +
       'Since 2021 there have been about ' + d3.format(',')(Math.round(postAverage)) + ' per month (' + changeText + ').');

@@ -71,10 +71,30 @@
         </p>
         <p>
             Limitations: this is only crime that was reported. Also, about 3% of thefts are recorded at exactly 12:00 AM,
-            usually because no one knows the real time, so midnight looks higher than it really is.
+            usually because no one knows the real time, so midnight looks higher than it really is. Finally, in 2024
+            the police started using a new description, "THEFT FROM MOTOR VEHICLE" (about 2,300 thefts in 2024 and 5,900
+            in 2025). It doesn't match any of our groups, so it lands in "Other theft". Before 2024 these thefts were
+            probably recorded under the dollar amount codes instead. That makes "Other theft" look like it more than
+            quadrupled and makes "$500 and under" and "Over $500" look a bit lower than they really are, so View 2 leaves
+            "Other theft" out of its caption.
         </p>
 
         <h3>Design Decisions</h3>
+        <p>Interactions we implemented:</p>
+        <ul>
+            <li>Dynamic filters (Category I): year range, Theft / Motor vehicle theft checkboxes, theft type, type of
+                place and side of the city. All three charts update together, and a summary line shows how many thefts
+                match. Reset puts everything back.</li>
+            <li>Brushing and linking (Category I): drag across View 1 to pick years, and every chart updates to those years.</li>
+            <li>Selecting (Category I): click a bar in View 2 to filter every chart to that category, and click it
+                again to clear it.</li>
+            <li>Zooming (Category II): the View 1 drag also zooms the line chart and the heatmap to the chosen years.</li>
+            <li>Details on demand (Category II): tooltips on every point, bar and heatmap cell.</li>
+            <li>Highlighting and annotation (Category II): the hovered mark and the selected bar are outlined. View 1
+                has dashed lines for the stay-at-home order and the 2016-2019 average, and View 3 has a striped 12 AM
+                column and a bracket pointing out the overnight change. Every chart's caption is computed from the
+                current filters.</li>
+        </ul>
         <p>
             View 1 (thefts per month): We used a line chart because it shows change over time clearly. We used months
             instead of years so you can see the drop in spring 2020 and the summer peaks every year. The dashed lines show
@@ -143,28 +163,58 @@
         </p>
 
         <h3>Development Process</h3>
-        <p>(Everyone: who did what, about how many hours, and what took the longest. See LOG.md.)</p>
+        <p>
+            We split the work by view so each person owned their own files. Mouhamadou did the data: the download
+            script, the cleaning script, the page skeleton, the shared filter code that links the charts, View 1 and the
+            dataset section of the write-up. Meksud did the filter panel and View 2. Buruk did View 3, the shared
+            tooltip, the page layout and the demo video. Each of us wrote the design rationale for our own chart. We
+            wrote down the shared parts (the data files, the filter names and what each view's functions take) in one
+            PROJECT.md file before we started coding, so our charts worked together the first time we connected them.
+        </p>
+        <p>
+            We spent about 16 people-hours in total (from our work log): about 5 hours for Mouhamadou, 6.5 hours for
+            Meksud and 4.5 hours for Buruk.
+        </p>
+        <p>
+            What took the most time:
+        </p>
+        <ul>
+            <li>Getting the data. The website's export kept failing on 8 million rows, so we had to use the API. Then
+                the same place or theft type was spelled differently in different years, so we had to check every value
+                to make sure it landed in the right group.</li>
+            <li>Linking the filters. Every chart had to update correctly when any filter, the View 1 drag or a View 2
+                click changed, and the dropdowns had to show the right values afterward. Meksud spent about 2 hours
+                just testing this.</li>
+            <li>Checking that our findings were real. Two things looked like big changes but came from how the police
+                record crimes: the 12 AM spike (unknown times), and the "Other theft" jump in 2024-2025 (a new
+                description code). We handled both in the charts and explained them in the write-up.</li>
+        </ul>
+        <p>
+            What went well: agreeing on PROJECT.md first meant we could work at the same time without breaking each
+            other's code. What we would do differently: check how each category changes year by year earlier, so we
+            find recording changes like the 2024 one before building the charts.
+        </p>
 
         <h3>AI Usage</h3>
         <p>
-            We used AI (Claude) as a coding helper. The design decisions were ours: we picked the dataset and our
+            We used AI (Claude and Chatgpt) as a coding helper. The design decisions were ours: we picked the dataset and our
             question, decided which crimes and years to include, chose the theft type and place groups, and designed the
             three linked views and how you interact with them. AI helped us turn those decisions into code faster.
         </p>
         <ul>
-            <li>Person A: used AI to write the script that downloads the data through the API (after the export kept
+            <li> Mouhamadou: used AI to write the script that downloads the data through the API (after the export kept
                 failing) and the cleaning script, to turn our View 1 design into D3 code, and to help fix bugs. We checked
                 its work by comparing our row counts to the portal's yearly totals, printing every place value to make sure
                 it landed in the right group, and testing the filters in the browser.
             </li>
 
-            <li>Person B: used AI to help implement the interactive filter panel
+            <li> Meksud: used AI to help implement the interactive filter panel
                 and turn our View 2 design into a D3 bar chart, and to help fix bugs.
                 We checked its work by testing the dropdowns, clicking bars to apply
                 and clear filters, making sure the other charts updated correctly,
                 and checking the browser console for errors.
             </li>
-            <li>Person C: used AI to turn our View 3 design into a D3 heatmap, to improve the shared tooltip and page
+            <li> Buruk: used AI to turn our View 3 design into a D3 heatmap, to improve the shared tooltip and page
                 layout, and to help fix bugs. We checked its work by recomputing the hourly shares in Python and comparing
                 them to the chart, testing several filter combinations, and checking the browser console for errors.
             </li>
@@ -173,6 +223,11 @@
             AI saved a lot of time, but we still had to catch its mistakes. For example, simple keyword matching put
             barbershops in the "bar" group and bowling alleys in "street/alley", and the first version of the code was more
             complicated than it needed to be, so we rewrote it in the same style as our labs.
+        </p>
+        <p>
+            We also used AI to question our results, not only to write code. When View 2 said "Other theft" went up
+            326%, we asked AI to help check the raw data year by year. It found that almost all of the increase was the
+            new "THEFT FROM MOTOR VEHICLE" code from 2024, so we explained it instead of reporting it as a real finding.
         </p>
 
         <h3>References</h3>
