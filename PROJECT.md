@@ -21,7 +21,7 @@ We compare three periods:
 3. **When:** time of day, and how it changed by year (View 3)
 
 ## Required interactions (from the assignment)
-- **Category I, dynamic queries:** A shared filter panel (year range, theft type, location type, city side). Every view updates when any filter changes. Clicking a bar in View 2 also sets a filter.
+- **Category I, dynamic queries:** A shared filter panel (year range, theft type, city side). Location type is set by clicking a View 2 bar in location mode. Every view updates when any filter changes. Clicking a bar in View 2 also sets a filter.
 - **Category II, details-on-demand:** Every mark has a tooltip showing the count, the share of the total, change versus the `pre` average, and the arrest rate where available.
 
 ## Data
@@ -98,7 +98,7 @@ year,hour,type_group,loc_group,side,count
 }
 ```
 
-`type_primary` maps each `type_group` to its `Primary Type`, so the Theft / Motor vehicle checkboxes can filter rows (the CSVs have no `primary_type` column). `side` is `Unknown` for the ~90 rows with no community area.
+`type_primary` maps each `type_group` to its `Primary Type`. (It was used by the Theft / Motor vehicle checkboxes, which we removed; it's no longer used by the page.) `side` is `Unknown` for the ~90 rows with no community area.
 
 All numbers shown on the page must be computed from these files. Nothing is hardcoded.
 
@@ -138,10 +138,8 @@ lookups      // lookups.json (lists for dropdowns, periods, type_primary)
 filters = {
   startYear: 2016,
   endYear: 2025,
-  showTheft: true,     // Theft checkbox
-  showVehicle: true,   // Motor vehicle theft checkbox
   typeGroup: 'All',    // 'All' or one type_group
-  locGroup: 'All',     // 'All' or one loc_group
+  locGroup: 'All',     // 'All' or one loc_group (set by clicking a View 2 bar)
   side: 'All'          // 'All' or one side
 }
 
@@ -150,8 +148,6 @@ updateAll()               // redraws every chart; call it after changing filters
 resetFilters()            // back to defaults, then redraws
 ```
 To change a filter: set it, then call `updateAll()`. Example: `filters.typeGroup = 'Retail'; updateAll();`
-
-Every row also has a `primary` field (`THEFT` or `MOTOR VEHICLE THEFT`) that `main.js` adds when the data loads.
 
 ### Each view
 Each view file has two functions. `main.js` calls the init function once, and `updateAll()` calls the update function every time a filter changes:
@@ -164,7 +160,7 @@ Each view file has two functions. `main.js` calls the init function once, and `u
 | `heatmapView.js` (C) | `initHeatmap()`, `updateHeatmap(data)` | filtered hourly rows |
 
 - If you need rows without some filters, pass them in `ignore`. **View 2 must use `filterData(allMonthly, ['years', 'typeGroup'])`** (or `'locGroup'` in location mode). Otherwise zooming View 1 to e.g. 2022-2024 removes the 2016-2019 rows and View 2 can't compare.
-- **The View 1 brush and the Reset button also change `filters`.** So `updateControls(data)` must set every dropdown/checkbox from `filters` each time it runs, or the controls will show the wrong values.
+- **The View 1 brush and the Reset button also change `filters`.** So `updateControls(data)` must set every dropdown from `filters` each time it runs, or the controls will show the wrong values.
 - Each view has a caption element in `index.html` (`#trend-caption`, `#change-caption`, `#heatmap-caption`). Write the main takeaway there, computed from the data.
 - `controls.js`, `changeView.js` and `heatmapView.js` start as placeholders. Replace them but keep the same function names.
 
@@ -197,8 +193,7 @@ Tooltip content, in this order: title (bold), count, change vs the 2016-2019 ave
 
 **Controls (B)**, a panel above the views:
 - year range (two selects or a dual slider)
-- Theft / Motor vehicle theft checkboxes
-- type group and location group dropdowns ('All' + each group)
+- type group dropdown ('All' + each group)
 - side dropdown
 - Reset button
 - A visible summary line, e.g. "Showing 412,903 thefts · 2016–2025 · All types · All sides"

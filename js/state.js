@@ -10,10 +10,8 @@ let lookups = {};
 const defaultFilters = {
   startYear: 2016,
   endYear: 2025,
-  showTheft: true,
-  showVehicle: true,
   typeGroup: 'All',
-  locGroup: 'All',
+  locGroup: 'All', // set by clicking a bar in View 2 (location mode)
   side: 'All'
 };
 let filters = { ...defaultFilters };
@@ -25,8 +23,6 @@ let filters = { ...defaultFilters };
 function filterData(rows, ignore = []) {
   return rows.filter(d => {
     if (!ignore.includes('years') && (d.year < filters.startYear || d.year > filters.endYear)) return false;
-    if (d.primary === 'THEFT' && !filters.showTheft) return false;
-    if (d.primary === 'MOTOR VEHICLE THEFT' && !filters.showVehicle) return false;
     if (!ignore.includes('typeGroup') && filters.typeGroup !== 'All' && d.type_group !== filters.typeGroup) return false;
     if (!ignore.includes('locGroup') && filters.locGroup !== 'All' && d.loc_group !== filters.locGroup) return false;
     if (filters.side !== 'All' && d.side !== filters.side) return false;

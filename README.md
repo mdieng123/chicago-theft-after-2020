@@ -12,7 +12,7 @@ An interactive D3 visualization with three linked views (monthly trend, what cha
 **Person A is done:** data, page, shared filters (`js/state.js`), loading (`js/main.js`), View 1 (`js/trendView.js`, line chart with tooltip and drag-to-zoom), and the A parts of the write-up. Live site: https://mdieng123.github.io/chicago-theft-after-2020/
 
 **Person B, next:**
-1. `js/controls.js`: replace the placeholder with the real filters (year range, Theft / Motor vehicle checkboxes, type, location and side dropdowns, Reset, summary line).
+1. `js/controls.js`: replace the placeholder with the real filters (year range, type and side dropdowns, Reset, summary line).
 2. `js/changeView.js`: replace the placeholder with View 2 (bars of % change before vs after, click a bar to filter).
 3. Write the View 2 and Filters parts of the write-up in `index.html`.
 

@@ -10,11 +10,6 @@ function init() {
     .then(([monthly, hourly, lk]) => {
       lookups = lk;
 
-      // Add the primary type (THEFT or MOTOR VEHICLE THEFT) to each row
-      // so the Theft / Motor vehicle checkboxes can filter on it
-      monthly.forEach(d => d.primary = lookups.type_primary[d.type_group]);
-      hourly.forEach(d => d.primary = lookups.type_primary[d.type_group]);
-
       allMonthly = monthly;
       allHourly = hourly;
       console.log('Loaded', allMonthly.length, 'monthly rows and', allHourly.length, 'hourly rows');

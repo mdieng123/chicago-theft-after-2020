@@ -16,7 +16,8 @@
 
         <h3>How to Use</h3>
         <p>
-            Use the filters to pick a type of theft, a type of place or a part of the city. All the charts update together.
+            Use the filters to pick years, a type of theft or a part of the city. All the charts update together.
+            To filter by type of place, switch the second chart to location type and click a bar.
             Hover over a point to see details. Drag across the line chart to zoom in on those years, and click Reset to go back.
         </p>
 
@@ -82,9 +83,8 @@
         <h3>Design Decisions</h3>
         <p>Interactions we implemented:</p>
         <ul>
-            <li>Dynamic filters (Category I): year range, Theft / Motor vehicle theft checkboxes, theft type, type of
-                place and side of the city. All three charts update together, and a summary line shows how many thefts
-                match. Reset puts everything back.</li>
+            <li>Dynamic filters (Category I): year range, theft type and side of the city. All three charts update
+                together, and a summary line shows how many thefts match. Reset puts everything back.</li>
             <li>Brushing and linking (Category I): drag across View 1 to pick years, and every chart updates to those years.</li>
             <li>Selecting (Category I): click a bar in View 2 to filter every chart to that category, and click it
                 again to clear it.</li>
@@ -155,11 +155,15 @@
             built up year by year, and hid 2020.
         </p>
         <p>
-            Filters: We added year range, crime category, theft type, location type, and city-side filters
+            Filters: We added year range, theft type, and city-side filters
             so users can explore specific theft patterns. All three charts use the same filters and update
             together. We also added a summary showing how many thefts match the current selection and a
             Reset button to return to the original view. This makes it easier to compare patterns without
-            switching between separate pages (dynamic filtering).
+            switching between separate pages (dynamic filtering). We first also had Theft / Motor vehicle theft
+            checkboxes and a location dropdown, but we removed them to keep the panel simple: the theft type
+            dropdown already has each motor vehicle group, and clicking a bar in View 2's location mode already
+            filters by type of place. Two controls for the same thing could also contradict each other and leave
+            every chart empty.
         </p>
 
         <h3>Development Process</h3>

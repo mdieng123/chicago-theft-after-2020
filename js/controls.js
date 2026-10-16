@@ -30,19 +30,7 @@ function initControls() {
     updateAll();
   });
 
-  const crimeGroup = panel.append('div').style('margin-bottom', '10px');
-  [['showTheft', 'Theft'], ['showVehicle', 'Motor vehicle theft']].forEach(([key, label]) => {
-    const wrapper = crimeGroup.append('label').style('margin-right', '18px');
-    wrapper.append('input').attr('type', 'checkbox').attr('id', key)
-      .on('change', function () {
-        filters[key] = this.checked;
-        updateAll();
-      });
-    wrapper.append('span').text(' ' + label);
-  });
-
   addSelect('type-group', 'Theft type:', ['All'].concat(lookups.type_groups), 'typeGroup');
-  addSelect('loc-group', 'Location:', ['All'].concat(lookups.loc_groups), 'locGroup');
   addSelect('city-side', 'City side:', ['All'].concat(lookups.sides), 'side');
 
   panel.append('div').append('button').text('Reset filters').on('click', resetFilters);
@@ -53,10 +41,7 @@ function updateControls(data) {
   // View 1 brushing and Reset can also change filters, so sync every input.
   d3.select('#start-year').property('value', filters.startYear);
   d3.select('#end-year').property('value', filters.endYear);
-  d3.select('#showTheft').property('checked', filters.showTheft);
-  d3.select('#showVehicle').property('checked', filters.showVehicle);
   d3.select('#type-group').property('value', filters.typeGroup);
-  d3.select('#loc-group').property('value', filters.locGroup);
   d3.select('#city-side').property('value', filters.side);
 
   const total = d3.sum(data, d => d.count);
